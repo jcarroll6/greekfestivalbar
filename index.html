@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Festival Bar — Volunteer Scheduler</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue:       #1a3a5c;
+    --gold:       #c8973a;
+    --gold-light: #f0d090;
+    --cream:      #fdf8f0;
+    --cream2:     #f5ede0;
+    --white:      #ffffff;
+    --muted:      #7a6a55;
+    --border:     #ddd0bc;
+    --success:    #2e7d45;
+    --warn:       #a05c10;
+    --danger:     #8b2020;
+    --radius:     10px;
+    --shadow:     0 2px 12px rgba(26,58,92,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--blue);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--blue);
+    color: var(--gold-light);
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    border-bottom: 3px solid var(--gold);
+  }
+  header .subtitle {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+  header .dates {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--gold-light);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+
+  /* TABS */
+  .tab-bar {
+    display: flex;
+    background: var(--blue);
+    padding: 0 1.5rem;
+    gap: 0;
+    border-bottom: 3px solid var(--gold);
+  }
+  .tab {
+    padding: 12px 22px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    color: var(--gold-light);
+    border: none;
+    background: transparent;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab:hover { color: #fff; }
+  .tab.active { color: #fff; border-bottom-color: var(--gold); }
+
+  /* MAIN */
+  main { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem; }
+
+  /* VOLUNTEER VIEW */
+  .vol-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    box-shadow: var(--shadow);
+  }
+  .vol-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .vol-card .vol-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+  }
+  .field-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--cream);
+    color: var(--blue);
+    margin-bottom: 1.5rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="text"]:focus { border-color: var(--gold); }
+
+  .days-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
+  .day-block {
+    background: var(--cream2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+  .day-block-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .check-row input[type="checkbox"] {
+    width: 16px; height: 16px;
+    margin-top: 2px;
+    accent-color: var(--gold);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .check-row .shift-info { flex: 1; }
+  .check-row .shift-name { font-size: 13px; font-weight: 500; color: var(--blue); }
+  .check-row .shift-time { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .submit-btn {
+    display: inline-block;
+    padding: 11px 30px;
+    background: var(--blue);
+    color: var(--gold-light);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .submit-btn:hover { background: #0f2640; }
+  .submit-btn:active { transform: scale(0.98); }
+  .success-msg {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #eaf5ee;
+    border: 1px solid #b0dbc0;
+    border-radius: var(--radius);
+    color: var(--success);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* CHAIRMAN VIEW */
+  .stats-row { display: flex; gap: 12px; margin-bottom: 1.75rem; flex-wrap: wrap; }
+  .stat-box {
+    flex: 1; min-width: 100px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--blue); }
+  .stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 2px; }
+
+  .day-section { margin-bottom: 2rem; }
+  .day-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gold);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .day-title .day-hours { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--muted); font-weight: 400; }
+
+  .shifts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .shift-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow);
+  }
+  .shift-card-name { font-size: 13px; font-weight: 500; color: var(--blue); }
+  .shift-card-time { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+  .badge-ok  { background: #e5f4eb; color: var(--success); }
+  .badge-low { background: #fef3e2; color: var(--warn); }
+
+  .section-lbl { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 6px 0 4px; }
+  .person-chip {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; padding: 5px 8px;
+    border-radius: 6px; margin-bottom: 3px;
+  }
+  .chip-assigned { background: #e8f0f9; color: var(--blue); border: 1px solid #b8cfe8; }
+  .chip-avail    { background: var(--cream2); color: var(--blue); border: 1px solid var(--border); }
+  .chip-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 11px; padding: 0 2px; line-height: 1;
+  }
+  .chip-btn-add    { color: var(--gold); font-weight: 700; font-size: 14px; }
+  .chip-btn-remove { color: var(--danger); }
+  .no-avail { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 4px; }
+
+  /* IMPORT SECTION */
+  .import-bar {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .import-bar h3 { font-size: 14px; font-weight: 500; color: var(--blue); margin-bottom: 4px; }
+  .import-bar p { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .import-bar textarea {
+    width: 100%; height: 80px;
+    font-size: 12px; font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border); border-radius: var(--radius);
+    background: var(--cream); color: var(--blue);
+    padding: 8px 12px; resize: vertical; outline: none;
+    transition: border-color 0.15s;
+  }
+  .import-bar textarea:focus { border-color: var(--gold); }
+  .import-actions { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+  .btn-sm {
+    padding: 7px 16px; font-size: 12px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: var(--radius); cursor: pointer; transition: background 0.15s;
+  }
+  .btn-primary { background: var(--blue); color: var(--gold-light); border: none; }
+  .btn-primary:hover { background: #0f2640; }
+  .btn-secondary { background: transparent; color: var(--blue); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--cream2); }
+  .import-msg { font-size: 12px; color: var(--success); display: none; }
+
+  @media (max-width: 500px) {
+    header h1 { font-size: 1.5rem; }
+    .days-grid { grid-template-columns: 1fr 1fr; }
+    .shifts-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="subtitle">St. Nicholas Greek Orthodox Church</div>
+  <h1>Festival Bar — Volunteers</h1>
+  <div class="dates">Thursday–Sunday &nbsp;·&nbsp; Sign up for your available shifts</div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab('volunteer', this)">Volunteer Sign-Up</button>
+  <button class="tab" onclick="switchTab('chairman', this)">Chairman View</button>
+</div>
+
+<main>
+  <!-- VOLUNTEER VIEW -->
+  <div id="volunteer" class="view active">
+    <div class="vol-card">
+      <h2>Select your availability</h2>
+      <p class="vol-desc">Check every shift you're able to work. The chairman will make final assignments.</p>
+      <div class="field-label">Your name</div>
+      <input type="text" id="vol-name" placeholder="First and last name" />
+      <div class="field-label">Shifts I'm available for</div>
+      <div class="days-grid" id="avail-checks"></div>
+      <button class="submit-btn" onclick="submitAvail()">Submit availability</button>
+      <div class="success-msg" id="success-msg">✓ Availability saved! Thank you for volunteering.</div>
+    </div>
+  </div>
+
+  <!-- CHAIRMAN VIEW -->
+  <div id="chairman" class="view" style="display:none">
+    <div class="import-bar">
+      <h3>Import from Google Sheets</h3>
+      <p>Paste copied cells from your sheet (tab-separated). First column = name, remaining columns = shift IDs checked off. Or use the volunteer sign-up tab to enter directly.</p>
+      <textarea id="import-text" placeholder="Name&#9;thu-1&#9;fri-2&#9;sat-3&#10;Maria Papadopoulos&#9;✓&#9;&#9;✓&#10;..."></textarea>
+      <div class="import-actions">
+        <button class="btn-sm btn-primary" onclick="importCSV()">Import</button>
+        <button class="btn-sm btn-secondary" onclick="clearVolunteers()">Clear all volunteers</button>
+        <span class="import-msg" id="import-msg"></span>
+      </div>
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+    <div id="sched-days"></div>
+  </div>
+</main>
+
+<script>
+const DAYS = [
+  { label: "Thursday", hours: "5:00 – 9:00 PM", shifts: [
+    { id: "thu-1", name: "Early", time: "5:00 – 7:00 PM" },
+    { id: "thu-2", name: "Late",  time: "7:00 – 9:00 PM" }
+  ]},
+  { label: "Friday", hours: "11:00 AM – 9:00 PM", shifts: [
+    { id: "fri-1", name: "Opening",   time: "11:00 AM – 2:00 PM" },
+    { id: "fri-2", name: "Afternoon", time: "2:00 – 5:30 PM" },
+    { id: "fri-3", name: "Evening",   time: "5:30 – 9:00 PM" }
+  ]},
+  { label: "Saturday", hours: "11:00 AM – 9:00 PM", shifts: [
+    { id: "sat-1", name: "Opening",   time: "11:00 AM – 2:00 PM" },
+    { id: "sat-2", name: "Afternoon", time: "2:00 – 5:30 PM" },
+    { id: "sat-3", name: "Evening",   time: "5:30 – 9:00 PM" }
+  ]},
+  { label: "Sunday", hours: "11:30 AM – 6:00 PM", shifts: [
+    { id: "sun-1", name: "Opening",  time: "11:30 AM – 2:30 PM" },
+    { id: "sun-2", name: "Afternoon",time: "2:30 – 4:15 PM" },
+    { id: "sun-3", name: "Closing",  time: "4:15 – 6:00 PM" }
+  ]}
+];
+
+const TARGET = 4;
+let volunteers = [];
+let assigned = {};
+DAYS.forEach(d => d.shifts.forEach(s => assigned[s.id] = []));
+
+// Build volunteer form
+function buildVolForm() {
+  const c = document.getElementById('avail-checks');
+  c.innerHTML = '';
+  DAYS.forEach(day => {
+    const db = document.createElement('div');
+    db.className = 'day-block';
+    db.innerHTML = `<div class="day-block-label">${day.label}</div>`;
+    day.shifts.forEach(s => {
+      const lbl = document.createElement('label');
+      lbl.className = 'check-row';
+      lbl.innerHTML = `<input type="checkbox" value="${s.id}" /><div class="shift-info"><div class="shift-name">${s.name}</div><div class="shift-time">${s.time}</div></div>`;
+      db.appendChild(lbl);
+    });
+    c.appendChild(db);
+  });
+}
+
+function submitAvail() {
+  const name = document.getElementById('vol-name').value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+  const checked = Array.from(document.querySelectorAll('#avail-checks input:checked')).map(i => i.value);
+  if (!checked.length) { alert('Please select at least one shift.'); return; }
+  const idx = volunteers.findIndex(v => v.name.toLowerCase() === name.toLowerCase());
+  if (idx >= 0) volunteers[idx].shifts = checked;
+  else volunteers.push({ name, shifts: checked });
+  document.getElementById('vol-name').value = '';
+  document.querySelectorAll('#avail-checks input').forEach(i => i.checked = false);
+  const msg = document.getElementById('success-msg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3500);
+}
+
+let chairmanUnlocked = false;
+
+function switchTab(tab, el) {
+  if (tab === 'chairman' && !chairmanUnlocked) {
+    const pw = prompt('Enter chairman password:');
+    if (pw !== 'bar') { alert('Incorrect password.'); return; }
+    chairmanUnlocked = true;
+  }
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('volunteer').style.display = tab === 'volunteer' ? 'block' : 'none';
+  document.getElementById('chairman').style.display  = tab === 'chairman'  ? 'block' : 'none';
+  if (tab === 'chairman') renderChairman();
+}
+
+// Import CSV/TSV
+function importCSV() {
+  const raw = document.getElementById('import-text').value.trim();
+  if (!raw) return;
+  const allShiftIds = DAYS.flatMap(d => d.shifts.map(s => s.id));
+  const lines = raw.split('\n').filter(l => l.trim());
+  let count = 0;
+  lines.forEach(line => {
+    const cols = line.split('\t').map(c => c.trim());
+    if (!cols[0]) return;
+    const name = cols[0];
+    // Support two formats:
+    // 1) Name, then shift IDs in subsequent columns (any non-empty = available)
+    // 2) Name, then checkmarks/x under shift columns (header row detected by no match to name pattern)
+    const shifts = [];
+    cols.slice(1).forEach((val, i) => {
+      const sid = allShiftIds[i];
+      if (sid && val && val !== '' && val.toLowerCase() !== 'n' && val.toLowerCase() !== 'no') {
+        shifts.push(sid);
+      }
+    });
+    if (name && shifts.length) {
+      const idx = volunteers.findIndex(v => v.name.toLowerCase() === name.toLowerCase());
+      if (idx >= 0) volunteers[idx].shifts = shifts;
+      else { volunteers.push({ name, shifts }); count++; }
+    }
+  });
+  const msg = document.getElementById('import-msg');
+  msg.style.display = 'inline';
+  msg.textContent = `✓ Imported ${count} volunteer(s)`;
+  setTimeout(() => msg.style.display = 'none', 3000);
+  renderChairman();
+}
+
+function clearVolunteers() {
+  if (!confirm('Clear all volunteers and assignments?')) return;
+  volunteers = [];
+  DAYS.forEach(d => d.shifts.forEach(s => assigned[s.id] = []));
+  renderChairman();
+}
+
+function assignVolunteer(name, shiftId) {
+  if (!assigned[shiftId].includes(name)) assigned[shiftId].push(name);
+  renderChairman();
+}
+
+function removeVolunteer(name, shiftId) {
+  assigned[shiftId] = assigned[shiftId].filter(n => n !== name);
+  renderChairman();
+}
+
+function renderChairman() {
+  const totalVols = volunteers.length;
+  const totalAssigned = new Set(Object.values(assigned).flat()).size;
+  const allShifts = DAYS.flatMap(d => d.shifts);
+  const filledShifts = allShifts.filter(s => assigned[s.id].length >= TARGET).length;
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-box"><div class="stat-num">${totalVols}</div><div class="stat-lbl">Volunteers</div></div>
+    <div class="stat-box"><div class="stat-num">${totalAssigned}</div><div class="stat-lbl">Assigned</div></div>
+    <div class="stat-box"><div class="stat-num">${filledShifts}/${allShifts.length}</div><div class="stat-lbl">Shifts filled</div></div>
+  `;
+
+  const container = document.getElementById('sched-days');
+  container.innerHTML = '';
+  DAYS.forEach(day => {
+    const dayDiv = document.createElement('div');
+    dayDiv.className = 'day-section';
+    dayDiv.innerHTML = `<div class="day-title">${day.label} <span class="day-hours">${day.hours}</span></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'shifts-row';
+
+    day.shifts.forEach(shift => {
+      const asgn = assigned[shift.id];
+      const avail = volunteers.filter(v => v.shifts.includes(shift.id) && !asgn.includes(v.name));
+      const count = asgn.length;
+      const badgeClass = count >= TARGET ? 'badge-ok' : 'badge-low';
+      const badgeText = count >= TARGET ? `${count} assigned` : `${count} / ${TARGET} needed`;
+
+      const asgnHTML = asgn.length
+        ? `<div class="section-lbl">Assigned</div>` + asgn.map(n =>
+            `<div class="person-chip chip-assigned">${n}<button class="chip-btn chip-btn-remove" onclick="removeVolunteer('${n.replace(/'/g,"\\'")}','${shift.id}')">✕</button></div>`
+          ).join('')
+        : '';
+
+      const availHTML = avail.length
+        ? `<div class="section-lbl">Available</div>` + avail.map(v =>
+            `<div class="person-chip chip-avail">${v.name}<button class="chip-btn chip-btn-add" onclick="assignVolunteer('${v.name.replace(/'/g,"\\'")}','${shift.id}')">+</button></div>`
+          ).join('')
+        : `<div class="no-avail">${volunteers.length ? 'None available' : 'No volunteers yet'}</div>`;
+
+      const sc = document.createElement('div');
+      sc.className = 'shift-card';
+      sc.innerHTML = `
+        <div class="shift-card-name">${shift.name}</div>
+        <div class="shift-card-time">${shift.time}</div>
+        <span class="badge ${badgeClass}">${badgeText}</span>
+        ${asgnHTML}${availHTML}
+      `;
+      grid.appendChild(sc);
+    });
+
+    dayDiv.appendChild(grid);
+    container.appendChild(dayDiv);
+  });
+}
+
+buildVolForm();
+</script>
+</body>
+</html>
