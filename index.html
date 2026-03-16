@@ -120,8 +120,10 @@
       <h3>Volunteer Responses</h3>
       <div id="sheet-status" class="sheet-status sheet-warn">⚠ Google Sheet not connected yet. Follow the setup instructions to link your sheet.</div>
       <div class="import-actions">
-        <button class="btn-sm btn-primary" onclick="loadFromSheet()">Load latest responses</button>
-        <button class="btn-sm btn-secondary" onclick="clearAll()">Clear all</button>
+       <button class="btn-sm btn-primary" onclick="loadFromSheet()">Load latest responses</button>
+      <button class="btn-sm btn-primary" onclick="saveAssignments()">Save assignments</button>
+      <button class="btn-sm btn-secondary" onclick="loadAssignments()">Load assignments</button>
+      <button class="btn-sm btn-secondary" onclick="clearAll()">Clear all</button>
         <span class="import-msg" id="import-msg"></span>
       </div>
     </div>
