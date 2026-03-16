@@ -247,7 +247,6 @@ function loadFromSheet() {
     volunteers = data.map(r => ({ name:r.name, phone:r.phone||'', email:r.email||'', shifts:r.shifts?r.shifts.split(','):[] }));
     msg.textContent = `✓ Loaded ${volunteers.length} volunteer(s)`; msg.style.color = 'var(--success)';
     setTimeout(() => msg.style.display = 'none', 3000);
-    loadAssignments();
     renderChairman();
   };
   script.onerror = function() { msg.textContent = 'Failed to load.'; msg.style.color = 'var(--danger)'; setTimeout(() => msg.style.display = 'none', 5000); };
