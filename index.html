@@ -304,7 +304,7 @@
 <header>
   <div class="subtitle">Greek Orthodox Cathedral of the Annunciation</div>
   <h1>Festival Bar — Volunteers</h1>
-  <div class="dates">Thursday–Sunday &nbsp;·&nbsp; Thank you all for volunteering to help with the bar at the Annunciation festival, May 28 - 31! Please share your availability with us below.</div>
+  <div class="dates">Thursday–Sunday &nbsp;·&nbsp; Sign up for your available shifts</div>
 </header>
 
 <div class="tab-bar">
@@ -320,6 +320,10 @@
       <p class="vol-desc">Check every shift you're able to work. The chairman will make final assignments.</p>
       <div class="field-label">Your name</div>
       <input type="text" id="vol-name" placeholder="First and last name" />
+      <div class="field-label">Phone number</div>
+      <input type="text" id="vol-phone" placeholder="(555) 555-5555" />
+      <div class="field-label">Email address</div>
+      <input type="text" id="vol-email" placeholder="you@email.com" />
       <div class="field-label">Shifts I'm available for</div>
       <div class="days-grid" id="avail-checks"></div>
       <button class="submit-btn" onclick="submitAvail()">Submit availability</button>
@@ -391,14 +395,18 @@ function buildVolForm() {
 }
 
 function submitAvail() {
-  const name = document.getElementById('vol-name').value.trim();
+  const name  = document.getElementById('vol-name').value.trim();
+  const phone = document.getElementById('vol-phone').value.trim();
+  const email = document.getElementById('vol-email').value.trim();
   if (!name) { alert('Please enter your name.'); return; }
   const checked = Array.from(document.querySelectorAll('#avail-checks input:checked')).map(i => i.value);
   if (!checked.length) { alert('Please select at least one shift.'); return; }
   const idx = volunteers.findIndex(v => v.name.toLowerCase() === name.toLowerCase());
-  if (idx >= 0) volunteers[idx].shifts = checked;
-  else volunteers.push({ name, shifts: checked });
+  if (idx >= 0) { volunteers[idx].shifts = checked; volunteers[idx].phone = phone; volunteers[idx].email = email; }
+  else volunteers.push({ name, phone, email, shifts: checked });
   document.getElementById('vol-name').value = '';
+  document.getElementById('vol-phone').value = '';
+  document.getElementById('vol-email').value = '';
   document.querySelectorAll('#avail-checks input').forEach(i => i.checked = false);
   const msg = document.getElementById('success-msg');
   msg.style.display = 'block';
@@ -499,15 +507,20 @@ function renderChairman() {
       const badgeClass = count >= TARGET ? 'badge-ok' : 'badge-low';
       const badgeText = count >= TARGET ? `${count} assigned` : `${count} / ${TARGET} needed`;
 
+      const contact = (v) => (v.phone || v.email)
+        ? `<span style="display:block;font-size:10px;color:var(--muted);margin-top:1px">${[v.phone,v.email].filter(Boolean).join(' · ')}</span>`
+        : '';
+
       const asgnHTML = asgn.length
-        ? `<div class="section-lbl">Assigned</div>` + asgn.map(n =>
-            `<div class="person-chip chip-assigned">${n}<button class="chip-btn chip-btn-remove" onclick="removeVolunteer('${n.replace(/'/g,"\\'")}','${shift.id}')">✕</button></div>`
-          ).join('')
+        ? `<div class="section-lbl">Assigned</div>` + asgn.map(n => {
+            const v = volunteers.find(x => x.name === n) || {};
+            return `<div class="person-chip chip-assigned" style="align-items:flex-start;height:auto;padding:5px 8px;"><span style="flex:1">${n}${contact(v)}</span><button class="chip-btn chip-btn-remove" onclick="removeVolunteer('${n.replace(/'/g,"\\'")}','${shift.id}')">✕</button></div>`;
+          }).join('')
         : '';
 
       const availHTML = avail.length
         ? `<div class="section-lbl">Available</div>` + avail.map(v =>
-            `<div class="person-chip chip-avail">${v.name}<button class="chip-btn chip-btn-add" onclick="assignVolunteer('${v.name.replace(/'/g,"\\'")}','${shift.id}')">+</button></div>`
+            `<div class="person-chip chip-avail" style="align-items:flex-start;height:auto;padding:5px 8px;"><span style="flex:1">${v.name}${contact(v)}</span><button class="chip-btn chip-btn-add" onclick="assignVolunteer('${v.name.replace(/'/g,"\\'")}','${shift.id}')">+</button></div>`
           ).join('')
         : `<div class="no-avail">${volunteers.length ? 'None available' : 'No volunteers yet'}</div>`;
 
