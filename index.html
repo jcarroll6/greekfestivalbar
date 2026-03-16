@@ -233,21 +233,35 @@ async function submitAvail() {
   btn.disabled = false; btn.textContent = 'Submit availability';
 }
 
-async function loadFromSheet() {
+function loadFromSheet() {
   if (!SCRIPT_URL) { alert('No Google Sheet connected yet.'); return; }
   const msg = document.getElementById('import-msg');
   msg.style.display = 'inline'; msg.style.color = 'var(--muted)'; msg.textContent = 'Loading...';
-  try {
-    const res = await fetch(SCRIPT_URL, { redirect: 'follow' });
-    const data = await res.json();
-    volunteers = data.map(r => ({ name:r.name, phone:r.phone||'', email:r.email||'', shifts:r.shifts?r.shifts.split(','):[] }));
-    msg.textContent = `✓ Loaded ${volunteers.length} volunteer(s)`; msg.style.color = 'var(--success)';
-    setTimeout(() => msg.style.display = 'none', 3000);
-    renderChairman();
-  } catch(e) {
+
+  const callbackName = 'sheetCallback_' + Date.now();
+  const script = document.createElement('script');
+
+  window[callbackName] = function(data) {
+    delete window[callbackName];
+    document.body.removeChild(script);
+    try {
+      volunteers = data.map(r => ({ name:r.name, phone:r.phone||'', email:r.email||'', shifts:r.shifts?r.shifts.split(','):[] }));
+      msg.textContent = `✓ Loaded ${volunteers.length} volunteer(s)`; msg.style.color = 'var(--success)';
+      setTimeout(() => msg.style.display = 'none', 3000);
+      renderChairman();
+    } catch(e) {
+      msg.textContent = 'Error reading data.'; msg.style.color = 'var(--danger)';
+      setTimeout(() => msg.style.display = 'none', 5000);
+    }
+  };
+
+  script.onerror = function() {
     msg.textContent = 'Failed to load. Try redeploying the script.'; msg.style.color = 'var(--danger)';
     setTimeout(() => msg.style.display = 'none', 5000);
-  }
+  };
+
+  script.src = SCRIPT_URL + '?callback=' + callbackName;
+  document.body.appendChild(script);
 }
 
 let chairmanUnlocked = false;
