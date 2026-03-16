@@ -239,7 +239,6 @@ function loadFromSheet() {
   if (!SCRIPT_URL) { alert('No Google Sheet connected yet.'); return; }
   const msg = document.getElementById('import-msg');
   msg.style.display = 'inline'; msg.style.color = 'var(--muted)'; msg.textContent = 'Loading...';
-
   const callbackName = 'sheetCallback_' + Date.now();
   const script = document.createElement('script');
   window[callbackName] = function(data) {
@@ -250,41 +249,9 @@ function loadFromSheet() {
     renderChairman();
   };
   script.onerror = function() { msg.textContent = 'Failed to load.'; msg.style.color = 'var(--danger)'; setTimeout(() => msg.style.display = 'none', 5000); };
-  script.src = SCRIPT_URL + '?action=responses&callback=' + callbackName;
+  script.src = SCRIPT_URL + '?callback=' + callbackName;
   document.body.appendChild(script);
 }
-function saveAssignments() {
-  if (!SCRIPT_URL) { alert('No Google Sheet connected.'); return; }
-  const msg = document.getElementById('import-msg');
-  msg.style.display = 'inline'; msg.style.color = 'var(--muted)'; msg.textContent = 'Saving...';
-  const payload = {
-    type: 'assignments',
-    assignments: Object.entries(assigned).map(([shiftId, vols]) => ({
-      shiftId, volunteers: vols.join(',')
-    }))
-  };
-  fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
-    .then(() => { msg.textContent = '✓ Assignments saved!'; msg.style.color = 'var(--success)'; setTimeout(() => msg.style.display = 'none', 3000); })
-    .catch(() => { msg.textContent = 'Save failed.'; msg.style.color = 'var(--danger)'; setTimeout(() => msg.style.display = 'none', 4000); });
-}
-
-function loadAssignments() {
-  if (!SCRIPT_URL) return;
-  const callbackName = 'assignCallback_' + Date.now();
-  const script = document.createElement('script');
-  window[callbackName] = function(data) {
-    delete window[callbackName]; document.body.removeChild(script);
-    data.forEach(row => {
-      if (row.shiftId && assigned.hasOwnProperty(row.shiftId)) {
-        assigned[row.shiftId] = row.volunteers ? row.volunteers.split(',').filter(Boolean) : [];
-      }
-    });
-    renderChairman();
-  };
-  script.src = SCRIPT_URL + '?action=assignments&callback=' + callbackName;
-  document.body.appendChild(script);
-}
-
 let chairmanUnlocked = false;
 function switchTab(tab, el) {
   if (tab === 'chairman' && !chairmanUnlocked) {
