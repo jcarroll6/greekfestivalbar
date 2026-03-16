@@ -304,7 +304,7 @@
 <header>
   <div class="subtitle">Greek Orthodox Cathedral of the Annunciation</div>
   <h1>Festival Bar — Volunteers</h1>
-  <div class="dates">Thursday–Sunday &nbsp;·&nbsp; Sign up for your available shifts</div>
+  <div class="dates">May 8–11, 2025 &nbsp;·&nbsp; Sign up for your available shifts</div>
 </header>
 
 <div class="tab-bar">
@@ -350,24 +350,29 @@
 
 <script>
 const DAYS = [
-  { label: "Thursday", hours: "5:00 – 9:00 PM", shifts: [
-    { id: "thu-1", name: "Early", time: "5:00 – 7:00 PM" },
-    { id: "thu-2", name: "Late",  time: "7:00 – 9:00 PM" }
+  { label: "Thursday, May 8th", hours: "4:30 – 9:00 PM", shifts: [
+    { id: "thu-1", name: "Set-up & Open", time: "4:30 – 7:00 PM" },
+    { id: "thu-2", name: "Clean-up & Close", time: "7:00 – 9:00 PM" }
   ]},
-  { label: "Friday", hours: "11:00 AM – 9:00 PM", shifts: [
-    { id: "fri-1", name: "Opening",   time: "11:00 AM – 2:00 PM" },
-    { id: "fri-2", name: "Afternoon", time: "2:00 – 5:30 PM" },
-    { id: "fri-3", name: "Evening",   time: "5:30 – 9:00 PM" }
+  { label: "Friday, May 9th", hours: "10:30 AM – 12:00 AM", shifts: [
+    { id: "fri-1", name: "Set-up & Open", time: "10:30 AM – 1:00 PM" },
+    { id: "fri-2", name: "Midday", time: "1:00 – 3:00 PM" },
+    { id: "fri-3", name: "Afternoon", time: "3:00 – 5:00 PM" },
+    { id: "fri-4", name: "Evening", time: "5:00 – 7:00 PM" },
+    { id: "fri-5", name: "Night", time: "7:00 – 9:00 PM" },
+    { id: "fri-6", name: "YAL Late Night HH", time: "9:00 PM – 12:00 AM" }
   ]},
-  { label: "Saturday", hours: "11:00 AM – 9:00 PM", shifts: [
-    { id: "sat-1", name: "Opening",   time: "11:00 AM – 2:00 PM" },
-    { id: "sat-2", name: "Afternoon", time: "2:00 – 5:30 PM" },
-    { id: "sat-3", name: "Evening",   time: "5:30 – 9:00 PM" }
+  { label: "Saturday, May 10th", hours: "10:30 AM – 9:30 PM", shifts: [
+    { id: "sat-1", name: "Set-up & Open", time: "10:30 AM – 1:00 PM" },
+    { id: "sat-2", name: "Midday", time: "1:00 – 3:00 PM" },
+    { id: "sat-3", name: "Afternoon", time: "3:00 – 5:00 PM" },
+    { id: "sat-4", name: "Evening", time: "5:00 – 7:00 PM" },
+    { id: "sat-5", name: "Clean-up & Close", time: "7:00 – 9:30 PM" }
   ]},
-  { label: "Sunday", hours: "11:30 AM – 6:00 PM", shifts: [
-    { id: "sun-1", name: "Opening",  time: "11:30 AM – 2:30 PM" },
-    { id: "sun-2", name: "Afternoon",time: "2:30 – 4:15 PM" },
-    { id: "sun-3", name: "Closing",  time: "4:15 – 6:00 PM" }
+  { label: "Sunday, May 11th", hours: "11:30 AM – 6:00 PM", shifts: [
+    { id: "sun-1", name: "Set-up & Open", time: "11:30 AM – 1:00 PM" },
+    { id: "sun-2", name: "Afternoon", time: "1:00 – 3:00 PM" },
+    { id: "sun-3", name: "Closing", time: "3:00 – 6:00 PM" }
   ]}
 ];
 
@@ -383,13 +388,21 @@ function buildVolForm() {
   DAYS.forEach(day => {
     const db = document.createElement('div');
     db.className = 'day-block';
-    db.innerHTML = `<div class="day-block-label">${day.label}</div>`;
+    const dayKey = day.label.split(',')[0].toLowerCase().replace(/\s/g,'');
+    db.innerHTML = `<div class="day-block-label">${day.label}</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-style:italic">Check all that apply</div>`;
     day.shifts.forEach(s => {
       const lbl = document.createElement('label');
       lbl.className = 'check-row';
       lbl.innerHTML = `<input type="checkbox" value="${s.id}" /><div class="shift-info"><div class="shift-name">${s.name}</div><div class="shift-time">${s.time}</div></div>`;
       db.appendChild(lbl);
     });
+    const sep = document.createElement('div');
+    sep.style = 'border-top:1px solid var(--border);margin:8px 0;';
+    db.appendChild(sep);
+    const unavailLbl = document.createElement('label');
+    unavailLbl.className = 'check-row';
+    unavailLbl.innerHTML = `<input type="checkbox" value="${dayKey}-unavail" /><div class="shift-info"><div class="shift-name" style="font-style:italic">I'm unavailable</div></div>`;
+    db.appendChild(unavailLbl);
     c.appendChild(db);
   });
 }
