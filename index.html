@@ -256,7 +256,7 @@ let chairmanUnlocked = false;
 function switchTab(tab, el) {
   if (tab === 'chairman' && !chairmanUnlocked) {
     const pw = prompt('Enter chairman password:');
-    if (pw !== 'bar') { alert('Incorrect password.'); return; }
+    if (pw !== '1908') { alert('Incorrect password.'); return; }
     chairmanUnlocked = true;
   }
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
